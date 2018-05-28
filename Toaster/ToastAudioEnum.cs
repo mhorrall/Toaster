@@ -5,7 +5,7 @@ namespace DesktopToast
 	/// Audio types of toast notifications
 	/// </summary>
 	/// <remarks>These types correspond to options in the toast audio options catalog except Silent.</remarks>
-	public enum ToastAudio
+	public enum ToastAudioEnum
 	{
 		/// <summary>
 		/// Default

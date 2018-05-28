@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 using Windows.UI.Notifications;
 using DesktopToast;
 using Microsoft.QueryStringDotNET;
-using NotificationsExtensions;
-using NotificationsExtensions.Toasts;
+using Microsoft.Toolkit.Uwp.Notifications;
+//using NotificationsExtensions;
+//using NotificationsExtensions.Toasts;
 
 
 namespace Toaster
@@ -27,8 +28,19 @@ namespace Toaster
                 ActivatorId = typeof(NotificationActivator).GUID
             };
 
+            //var toastManager = new ToastManager();
+
+            //var document = ToastManager.PrepareToastDocument(request);
+            //var toast = new ToastNotification(document);
+
+            //var testXml = document.GetXml();
+            //ToastNotificationManager.CreateToastNotifier(request.AppId).Show(toast);
+
             var result = ToastManager.ShowAsync(request);
             result.Wait();
+
+            //var result = ToastManager.ShowAsync(document, AumId);
+            //result.Wait();
         }
 
         private string ComposeInteractiveToast()
@@ -83,7 +95,7 @@ namespace Toaster
                 Visual = toastVisual,
                 Actions = toastAction,
                 Duration = ToastDuration.Long,
-                Audio = new NotificationsExtensions.Toasts.ToastAudio
+                Audio = new ToastAudio
                 {
                     Loop = true,
                     Src = new Uri("ms-winsoundevent:Notification.Looping.Alarm4")

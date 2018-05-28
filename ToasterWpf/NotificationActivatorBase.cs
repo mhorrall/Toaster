@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace Toaster
+namespace ToasterWpf
 {
 	/// <summary>
 	/// Apps must implement this activator to handle notification activation.
 	/// </summary>
-	public abstract class NotificationActivatorAb : NotificationActivatorAb.INotificationActivationCallback
+	public abstract class NotificationActivatorBase : NotificationActivatorBase.INotificationActivationCallback
 	{
 		public void Activate(string appUserModelId, string invokedArgs, NOTIFICATION_USER_INPUT_DATA[] data, uint dataCount)
 		{
@@ -57,9 +57,9 @@ namespace Toaster
 	/// </summary>
 	public class NotificationUserInput : IReadOnlyDictionary<string, string>
 	{
-		private NotificationActivatorAb.NOTIFICATION_USER_INPUT_DATA[] _data;
+		private NotificationActivatorBase.NOTIFICATION_USER_INPUT_DATA[] _data;
 
-		internal NotificationUserInput(NotificationActivatorAb.NOTIFICATION_USER_INPUT_DATA[] data)
+		internal NotificationUserInput(NotificationActivatorBase.NOTIFICATION_USER_INPUT_DATA[] data)
 		{
 			_data = data;
 		}

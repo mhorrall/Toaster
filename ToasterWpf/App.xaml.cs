@@ -1,76 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using Windows.Data.Xml.Dom;
-using Windows.UI.Notifications;
-using DesktopToast.Helper;
-using Microsoft.QueryStringDotNET;
-using Microsoft.Win32;
+using System.Reflection;
+using System.Threading.Tasks;
+using System.Windows;
 using NLog;
-//using NotificationsExtensions;
-//using NotificationsExtensions.Toasts;
+using ToasterWpf.Model;
 
-
-namespace Toaster
+namespace ToasterWpf
 {
-    static class Program
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
+    public partial class App : Application
     {
         private const string AUMID = "Brave";
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        static void Main(string[] args)
+        protected override void OnStartup(StartupEventArgs e)
         {
-            //Process.Start("https://www.brave.com/");
-            //Thread.Sleep(3000);
-            //new Thread(() =>
-            //{
-            //    Thread.CurrentThread.IsBackground = true;
-            //    /* run your code here */
-            //    //Console.WriteLine("Hello, world");
-            //    Process.Start("https://www.brave.com/");
-
-           
-            //}).Start();
-
             ActivatorHelper.RegisterActivator<NotificationActivator>();
             ActivatorHelper.RegisterComServer(typeof(NotificationActivator),
                 Process.GetCurrentProcess().MainModule.FileName);
 
-            if (args.Length > 0)
+            if (e.Args.Length > 0)
             {
                 // If "-Embedding" argument is appended, it will mean this application is started by COM.
-                if (args.Contains("-Embedding"))
+                if (e.Args.Contains("-Embedding"))
                 {
                     Logger.Info("Started by COM");
                 }
             }
 
-            if (args.Length == 0)
+            if (e.Args.Length == 0)
             {
                 Console.WriteLine("No args provided.\n");
                 PrintHelp();
             }
-            else if (args.Length == 1)
+            else if (e.Args.Length == 1)
             {
-                if (args[0] == "?") PrintHelp();
-                //else ShowToast(args[0]);
+                if (e.Args[0] == "?") PrintHelp();
+                //else ShowToast(e.Args[0]);
             }
             else
             {
                 var toastModel = new ToastModel();
-                for (int i = 0; i < args.Length; i++)
+                for (int i = 0; i < e.Args.Length; i++)
                 {
-                    switch (args[i])
+                    switch (e.Args[i])
                     {
                         case "-t":
-                            if (i + 1 < args.Length)
+                            if (i + 1 < e.Args.Length)
                             {
-                                toastModel.Title = args[i + 1];
+                                toastModel.Title = e.Args[i + 1];
                             }
                             else
                             {
@@ -82,17 +67,17 @@ namespace Toaster
                             break;
 
                         case "-b":
-                            if (i + 1 < args.Length)
+                            if (i + 1 < e.Args.Length)
                             {
-                                toastModel.Body = args[i + 1];
+                                toastModel.Body = e.Args[i + 1];
                             }
 
 
                             break;
                         case "-p":
-                            if (i + 1 < args.Length)
+                            if (i + 1 < e.Args.Length)
                             {
-                                toastModel.ImagePath = args[i + 1];
+                                toastModel.ImagePath = e.Args[i + 1];
                             }
                             else
                             {
@@ -111,16 +96,34 @@ namespace Toaster
                     }
                 }
 
+
+
                 var tstService = new SendToastService();
                 tstService.ShowInteractiveToast(toastModel, AUMID);
+
+
+
+                // If launched from a toast
+                // This launch arg was specified in our WiX installer where we register the LocalServer32 exe path.
+                //if (e.e.Args.Contains(DesktopNotificationManagerCompat.TOAST_ACTIVATED_LAUNCH_ARG))
+                //{
+                //    // Our NotificationActivator code will run after this completes,
+                //    // and will show a window if necessary.
+                //}
+                //else
+                //{
+                //    // Show the window
+                //    // In App.xaml, be sure to remove the StartupUri so that a window doesn't
+                //    // get created by default, since we're creating windows ourselves (and sometimes we
+                //    // don't want to create a window if handling a background activation).
+                //    //new MainWindow().Show();
+                //}
+
+                // base.OnStartup(e);
+                Application.Current.Shutdown();
             }
-        }
 
-        public static void OpenAction()
-        {
-            Process.Start("https://www.brave.com/");
         }
-
         private static void PrintHelp()
         {
             String inst = "---- Usage ----\n" +
@@ -142,62 +145,5 @@ namespace Toaster
                           "Windows file paths only.\n";
             Console.WriteLine(inst);
         }
-
-        private static void SetSilent(bool useSound, XmlDocument toastXml)
-        {
-            var audio = toastXml.GetElementsByTagName("audio").FirstOrDefault();
-
-            if (audio == null)
-            {
-                audio = toastXml.CreateElement("audio");
-                var toastNode = ((XmlElement)toastXml.SelectSingleNode("/toast"));
-
-                if (toastNode != null)
-                {
-                    toastNode.AppendChild(audio);
-                }
-            }
-
-            var attribute = toastXml.CreateAttribute("silent");
-            attribute.Value = (!useSound).ToString().ToLower();
-            audio.Attributes.SetNamedItem(attribute);
-        }
-
-        private static void ToastActivated(ToastNotification sender, object e)
-        {
-            Console.WriteLine("Activated");
-            Environment.Exit(0);
-        }
-
-        private static void ToastDismissed(ToastNotification sender, ToastDismissedEventArgs e)
-        {
-            String outputText = "";
-            int exitCode = -1;
-            switch (e.Reason)
-            {
-                case ToastDismissalReason.ApplicationHidden:
-                    outputText = "Hidden";
-                    exitCode = 1;
-                    break;
-                case ToastDismissalReason.UserCanceled:
-                    outputText = "Dismissed";
-                    exitCode = 2;
-                    break;
-                case ToastDismissalReason.TimedOut:
-                    outputText = "Timeout";
-                    exitCode = 3;
-                    break;
-            }
-            Console.WriteLine(outputText);
-            Environment.Exit(exitCode);
-        }
-
-        private static void ToastFailed(ToastNotification sender, ToastFailedEventArgs e)
-        {
-            Console.WriteLine("Error.");
-            Environment.Exit(-1);
-        }
-
-
     }
 }

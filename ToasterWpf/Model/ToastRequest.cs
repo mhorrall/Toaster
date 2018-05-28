@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Text;
 
-namespace DesktopToast
+namespace ToasterWpf.Model
 {
 	/// <summary>
 	/// Toast request container
@@ -15,12 +11,15 @@ namespace DesktopToast
 	[DataContract]
 	public class ToastRequest
 	{
-		#region Public Property
+	    public ToastRequest()
+	    { }
 
-		/// <summary>
-		/// Toast title (optional)
-		/// </summary>
-		[DataMember]
+        #region Public Property
+
+        /// <summary>
+        /// Toast title (optional)
+        /// </summary>
+        [DataMember]
 		public string ToastTitle { get; set; }
 
 		/// <summary>
@@ -152,10 +151,10 @@ namespace DesktopToast
 
 		#region Internal Property
 
-		internal bool IsShortcutValid =>
-			!string.IsNullOrWhiteSpace(AppId) &&
-			!string.IsNullOrWhiteSpace(ShortcutFileName) &&
-			!string.IsNullOrWhiteSpace(ShortcutTargetFilePath);
+		//internal bool IsShortcutValid =>
+		//	!string.IsNullOrWhiteSpace(AppId) &&
+		//	!string.IsNullOrWhiteSpace(ShortcutFileName) &&
+		//	!string.IsNullOrWhiteSpace(ShortcutTargetFilePath);
 
 		internal bool IsToastValid =>
 			!string.IsNullOrWhiteSpace(AppId) &&
@@ -164,56 +163,11 @@ namespace DesktopToast
 
 		#endregion
 
-		#region Constructor
 
-		/// <summary>
-		/// Default constructor
-		/// </summary>
-		public ToastRequest()
-		{ }
 
-		internal ToastRequest(string requestJson) : this()
-		{
-			Import(requestJson);
-		}
 
-		#endregion
 
-		#region Import/Export
 
-		/// <summary>
-		/// Imports from a request in JSON format.
-		/// </summary>
-		/// <param name="requestJson">Request in JSON format</param>
-		internal void Import(string requestJson)
-		{
-			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(requestJson)))
-			{
-				var serializer = new DataContractJsonSerializer(typeof(ToastRequest));
-				var buff = (ToastRequest)serializer.ReadObject(stream);
-
-				typeof(ToastRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-					.Where(x => x.CanWrite)
-					.ToList()
-					.ForEach(x => x.SetValue(this, x.GetValue(buff)));
-			}
-		}
-
-		/// <summary>
-		/// Exports a request in JSON format.
-		/// </summary>
-		/// <returns>Request in JSON format</returns>
-		internal string Export()
-		{
-			using (var stream = new MemoryStream())
-			{
-				var serializer = new DataContractJsonSerializer(typeof(ToastRequest));
-				serializer.WriteObject(stream, this);
-
-				return Encoding.UTF8.GetString(stream.ToArray());
-			}
-		}
-
-		#endregion
+		
 	}
 }

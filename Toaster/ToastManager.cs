@@ -7,6 +7,8 @@ using Windows.Foundation;
 using Windows.UI.Notifications;
 using DesktopToast;
 using DesktopToast.Helper;
+using Microsoft.Toolkit.Uwp.Notifications;
+
 
 namespace Toaster
 {
@@ -15,95 +17,96 @@ namespace Toaster
 	/// </summary>
 	public class ToastManager
 	{
-		/// <summary>
-		/// Shows a toast.
-		/// </summary>
-		/// <param name="request">Toast request</param>
-		/// <returns>Result of showing a toast</returns>
-		public static async Task<ToastResult> ShowAsync(ToastRequest request)
-		{
-			if (request == null)
-				throw new ArgumentNullException(nameof(request));
+        /// <summary>
+        /// Shows a toast.
+        /// </summary>
+        /// <param name="request">Toast request</param>
+        /// <returns>Result of showing a toast</returns>
+        public static async Task<ToastResult> ShowAsync(ToastRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
 
-			if (!OsVersion.IsEightOrNewer)
-				return ToastResult.Unavailable;
+            if (!OsVersion.IsEightOrNewer)
+                return ToastResult.Unavailable;
 
-			if (request.IsShortcutValid)
-				await CheckInstallShortcut(request);
+            if (request.IsShortcutValid)
+                await CheckInstallShortcut(request);
 
-			if (!request.IsToastValid)
-				return ToastResult.Invalid;
+            if (!request.IsToastValid)
+                return ToastResult.Invalid;
 
-	
+
 
             var document = PrepareToastDocument(request);
 
-			if (document == null)
-				return ToastResult.Invalid;
+            if (document == null)
+                return ToastResult.Invalid;
 
-		    var toast = new ToastNotification(document);
 
-		    var testXml = document.GetXml();
-		     ToastNotificationManager.CreateToastNotifier(request.AppId).Show(toast);
+            var toast = new ToastNotification(document);
 
-		    return ToastResult.Activated;
-            // return await ShowBaseAsync(document, request.AppId);
+            var testXml = document.GetXml();
+            //ToastNotificationManager.CreateToastNotifier(request.AppId).Show(toast);
+
+            //return ToastResult.Activated;
+            return await ShowBaseAsync(document, request.AppId);
         }
 
-	    //public ToastResult Show(ToastRequest request)
-	    //{
-	    //    if (request == null)
-	    //        throw new ArgumentNullException(nameof(request));
+        public ToastResult Show(ToastRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
 
-	    //    if (!OsVersion.IsEightOrNewer)
-	    //        return ToastResult.Unavailable;
+            if (!OsVersion.IsEightOrNewer)
+                return ToastResult.Unavailable;
 
-	    //    if (request.IsShortcutValid)
-	    //         CheckInstallShortcut(request).Wait();
+            if (request.IsShortcutValid)
+                CheckInstallShortcut(request).Wait();
 
-	    //    if (!request.IsToastValid)
-	    //        return ToastResult.Invalid;
+            if (!request.IsToastValid)
+                return ToastResult.Invalid;
 
 
 
-	    //    var document = PrepareToastDocument(request);
+            var document = PrepareToastDocument(request);
 
-	    //    if (document == null)
-	    //        return ToastResult.Invalid;
+            if (document == null)
+                return ToastResult.Invalid;
 
-	    //    var toast = new ToastNotification(document);
-	    //    ToastNotificationManager.CreateToastNotifier(request.AppId).Show(toast);
+            var toast = new ToastNotification(document);
+            ToastNotificationManager.CreateToastNotifier(request.AppId).Show(toast);
 
-	    //    return ToastResult.Activated;
-	    //}
+            return ToastResult.Activated;
+        }
 
-		/// <summary>
-		/// Shows a toast using JSON ToastRequest request.
-		/// </summary>
-		/// <param name="requestJson">Toast request in JSON format</param>
-		/// <returns>Result of showing a toast</returns>
-		public static async Task<ToastResult> ShowAsync(string requestJson)
-		{
-			ToastRequest request;
-			try
-			{
-				request = new ToastRequest(requestJson);
-			}
-			catch
-			{
-				return ToastResult.Invalid;
-			}
+        /// <summary>
+        /// Shows a toast using JSON ToastRequest request.
+        /// </summary>
+        /// <param name="requestJson">Toast request in JSON format</param>
+        /// <returns>Result of showing a toast</returns>
+        //public static async Task<ToastResult> ShowAsync(string requestJson)
+        //{
+        //	ToastRequest request;
+        //	try
+        //	{
+        //		request = new ToastRequest(requestJson);
+        //	}
+        //	catch
+        //	{
+        //		return ToastResult.Invalid;
+        //	}
 
-			return await ShowAsync(request);
-		}
+        //	return await ShowAsync(request);
+        //}
 
-		/// <summary>
-		/// Shows a toast without toast request.
-		/// </summary>
-		/// <param name="document">Toast document</param>
-		/// <param name="appId">AppUserModelID</param>
-		/// <returns>Result of showing a toast</returns>
-		public static async Task<ToastResult> ShowAsync(XmlDocument document, string appId)
+        /// <summary>
+        /// Shows a toast without toast request.
+        /// </summary>
+        /// <param name="document">Toast document</param>
+        /// <param name="appId">AppUserModelID</param>
+        /// <returns>Result of showing a toast</returns>
+        public async Task<ToastResult> ShowAsync(XmlDocument document, string appId)
 		{
 			if (document == null)
 				throw new ArgumentNullException(nameof(document));
@@ -131,7 +134,7 @@ namespace Toaster
 		/// </summary>
 		/// <param name="request">Toast request</param>
 		/// <returns>Toast document</returns>
-		private static XmlDocument PrepareToastDocument(ToastRequest request)
+		public static XmlDocument PrepareToastDocument(ToastRequest request)
 		{
 			XmlDocument document;
 			if (!string.IsNullOrWhiteSpace(request.ToastXml))
@@ -271,7 +274,7 @@ namespace Toaster
 
 		private static XmlDocument AddAudio(XmlDocument document, ToastRequest request)
 		{
-			var option = CheckAudio(request.ToastAudio);
+			var option = CheckAudio(request.ToastAudioEnum);
 			if (option == AudioOption.Long)
 				document.DocumentElement.SetAttribute("duration", "long");
 
@@ -282,7 +285,7 @@ namespace Toaster
 			}
 			else
 			{
-				audioElement.SetAttribute("src", $"ms-winsoundevent:Notification.{request.ToastAudio.ToString().ToCamelWithSeparator('.')}");
+				audioElement.SetAttribute("src", $"ms-winsoundevent:Notification.{request.ToastAudioEnum.ToString().ToCamelWithSeparator('.')}");
 				audioElement.SetAttribute("loop", (option == AudioOption.Long) ? "true" : "false");
 			}
 			document.DocumentElement.AppendChild(audioElement);
@@ -290,34 +293,34 @@ namespace Toaster
 			return document;
 		}
 
-		private static AudioOption CheckAudio(ToastAudio audio)
-		{
-			switch (audio)
-			{
-				case ToastAudio.Silent:
-					return AudioOption.Silent;
+        private static AudioOption CheckAudio(ToastAudioEnum audio)
+        {
+            switch (audio)
+            {
+                case ToastAudioEnum.Silent:
+                    return AudioOption.Silent;
 
-				case ToastAudio.Default:
-				case ToastAudio.IM:
-				case ToastAudio.Mail:
-				case ToastAudio.Reminder:
-				case ToastAudio.SMS:
-					return AudioOption.Short;
+                case ToastAudioEnum.Default:
+                case ToastAudioEnum.IM:
+                case ToastAudioEnum.Mail:
+                case ToastAudioEnum.Reminder:
+                case ToastAudioEnum.SMS:
+                    return AudioOption.Short;
 
-				default:
-					return AudioOption.Long;
-			}
-		}
+                default:
+                    return AudioOption.Long;
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region Shortcut
+        #region Shortcut
 
-		/// <summary>
-		/// Waiting duration before showing a toast after the shortcut file is installed
-		/// </summary>
-		/// <remarks>It seems that roughly 3 seconds are required.</remarks>
-		private static readonly TimeSpan _waitingDuration = TimeSpan.FromSeconds(3);
+        /// <summary>
+        /// Waiting duration before showing a toast after the shortcut file is installed
+        /// </summary>
+        /// <remarks>It seems that roughly 3 seconds are required.</remarks>
+        private static readonly TimeSpan _waitingDuration = TimeSpan.FromSeconds(3);
 
 		/// <summary>
 		/// Checks and installs a shortcut file in Start menu.

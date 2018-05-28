@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using DesktopToast.Helper;
 using Microsoft.Win32;
+using ToasterWpf.Helper;
 
-namespace Toaster
+namespace ToasterWpf
 {
 	public  class ActivatorHelper
 	{
@@ -38,7 +39,7 @@ namespace Toaster
 		/// Registers the activator type as a COM server client so that Windows can launch your activator.
 		/// </summary>
 		/// <typeparam name="T">Your implementation of NotificationActivator. Must have GUID and ComVisible attributes on class.</typeparam>
-		public static void RegisterActivator<T>() where T : NotificationActivatorAb
+		public static void RegisterActivator<T>() where T : NotificationActivatorBase
 		{
 			if (!OsVersion.IsTenOrNewer)
 				return;
@@ -100,7 +101,7 @@ namespace Toaster
 			}
 		}
 		public const string TOAST_ACTIVATED_LAUNCH_ARG = "-ToastActivated";
-		private static void RegisterComServer<T>(String exePath) where T : NotificationActivatorAb
+		private static void RegisterComServer<T>(String exePath) where T : NotificationActivatorBase
 		{
 			// We register the EXE to start up when the notification is activated
 			string regString = $"SOFTWARE\\Classes\\CLSID\\{{{typeof(T).GUID}}}\\LocalServer32";
