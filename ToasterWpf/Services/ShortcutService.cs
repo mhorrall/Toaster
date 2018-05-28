@@ -18,7 +18,7 @@ namespace ToasterWpf.Services
         /// Checks and installs a shortcut file in Start menu.
         /// </summary>
         /// <param name="shortcutModel">Toast shortcutModel</param>
-        public static async Task CheckInstallShortcut(ShortcutModel shortcutModel)
+        public static void CheckInstallShortcut(ShortcutModel shortcutModel)
         {
             var shortcutFilePath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), // Not CommonStartMenu
@@ -49,7 +49,9 @@ namespace ToasterWpf.Services
                     appId: shortcutModel.AppId,
                     activatorId: shortcutModel.ActivatorId);
 
-                await Task.Delay(_waitingDuration);
+                System.Threading.Thread.Sleep(_waitingDuration);
+
+                //await Task.Delay(_waitingDuration);
             }
         }
     }

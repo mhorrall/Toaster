@@ -5,22 +5,22 @@ using ToasterWpf.Model;
 
 namespace ToasterWpf.Services
 {
-    public class SendToastService
+    public static class ToastService
     {
-        public void ShowInteractiveToast(ToastModel toastModel, string aumId)
+        public static void ShowInteractiveToast(ToastModel toastModel, string appId)
         {
             var toastXml = new ToastXml(toastModel);
 
             // Register shortcut
             var shortcut = new ShortcutModel
             {
-                ShortcutFileName = aumId + ".lnk",
+                ShortcutFileName = appId + ".lnk",
                 ShortcutTargetFilePath = Assembly.GetExecutingAssembly().Location,
-                AppId = aumId,
+                AppId = appId,
                 ActivatorId = typeof(NotificationActivator).GUID
             };
 
-            ShortcutService.CheckInstallShortcut(shortcut).Wait();
+            ShortcutService.CheckInstallShortcut(shortcut);
 
             // Create Xml document
             var document = new XmlDocument();
@@ -28,9 +28,7 @@ namespace ToasterWpf.Services
 
             // Send toast
             var toast = new ToastNotification(document);
-            ToastNotificationManager.CreateToastNotifier(aumId).Show(toast);
+            ToastNotificationManager.CreateToastNotifier(appId).Show(toast);
         }
-
-        
     }
 }

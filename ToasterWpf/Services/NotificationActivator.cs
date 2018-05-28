@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Microsoft.QueryStringDotNET;
@@ -10,7 +11,7 @@ namespace ToasterWpf.Services
 	/// Inherited class of notification activator (for Action Center of Windows 10)
 	/// </summary>
 	/// <remarks>The CLSID of this class must be unique for each application.</remarks>
-	[Guid("182a25aa-6bcb-4cee-b13e-f9a727ddeb48"), ComVisible(true), ClassInterface(ClassInterfaceType.None)]
+	[Guid("7ece71a4-910c-4541-9191-1ee083a3c0e8"), ComVisible(true), ClassInterface(ClassInterfaceType.None)]
 	[ComSourceInterfaces(typeof(INotificationActivationCallback))]
 	public class NotificationActivator : NotificationActivatorBase
 	{
@@ -32,15 +33,16 @@ namespace ToasterWpf.Services
 				    case "open":
                         _logger.Info("captured open");
 				        OpenUri("https://www.brave.com/");
+				        Application.Current.Shutdown();
                         break;
 				    case "close":
 					    _logger.Info("captured dismiss");
-
-					    break;
+				        Application.Current.Shutdown();
+                        break;
 				    default:
 					    break;
 			    }
-                Application.Current.Shutdown();
+                
             });
         }
 	    public static bool IsValidUri(string uri)
@@ -57,7 +59,7 @@ namespace ToasterWpf.Services
 	    {
 	        if (!IsValidUri(uri))
 	            return false;
-	        System.Diagnostics.Process.Start(uri);
+	        Process.Start(uri);
 	        return true;
 	    }
     }

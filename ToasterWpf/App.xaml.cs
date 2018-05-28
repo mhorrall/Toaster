@@ -18,14 +18,16 @@ namespace ToasterWpf
     /// </summary>
     public partial class App : Application
     {
-        private const string AUMID = "Brave";
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private const string AppId = "AppID";
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Register Activator and COM server
             ActivatorHelper.RegisterActivator<NotificationActivator>();
             ActivatorHelper.RegisterComServer(typeof(NotificationActivator),
                 Process.GetCurrentProcess().MainModule.FileName);
+
 
             if (e.Args.Length > 0)
             {
@@ -34,97 +36,71 @@ namespace ToasterWpf
                 {
                     Logger.Info("Started by COM");
                 }
-            }
-
-            if (e.Args.Length == 0)
-            {
-                Console.WriteLine("No args provided.\n");
-                PrintHelp();
-            }
-            else if (e.Args.Length == 1)
-            {
-                if (e.Args[0] == "?") PrintHelp();
-                //else ShowToast(e.Args[0]);
-            }
-            else
-            {
-                var toastModel = new ToastModel();
-                for (int i = 0; i < e.Args.Length; i++)
+                else
                 {
-                    switch (e.Args[i])
+                    if (e.Args.Length == 0)
                     {
-                        case "-t":
-                            if (i + 1 < e.Args.Length)
+                        Console.WriteLine("No args provided.\n");
+                    }
+                    else
+                    {
+                        var toastModel = new ToastModel();
+                        for (int i = 0; i < e.Args.Length; i++)
+                        {
+                            switch (e.Args[i])
                             {
-                                toastModel.Title = e.Args[i + 1];
-                            }
-                            else
-                            {
-                                Console.WriteLine(
-                                    "Missing argument to -t.\n Supply argument as -t \"bold title string\"\n");
-                                Environment.Exit(-1);
-                            }
+                                case "-t":
+                                    if (i + 1 < e.Args.Length)
+                                    {
+                                        toastModel.Title = e.Args[i + 1];
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine(
+                                            @"Missing argument to -t. Supply argument as -t ""bold title string""");
+                                        Environment.Exit(-1);
+                                    }
+                                    break;
+                                case "-b":
+                                    if (i + 1 < e.Args.Length)
+                                    {
+                                        toastModel.Body = e.Args[i + 1];
+                                    }
 
-                            break;
+                                    break;
+                                case "-p":
+                                    if (i + 1 < e.Args.Length)
+                                    {
+                                        toastModel.ImagePath = e.Args[i + 1];
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine(
+                                            "Missing argument to -p.\n Supply argument as -p \"image path\"\n");
+                                        Environment.Exit(-1);
+                                    }
 
-                        case "-b":
-                            if (i + 1 < e.Args.Length)
-                            {
-                                toastModel.Body = e.Args[i + 1];
+                                    break;
+                                case "-silent":
+                                    toastModel.Silent = true;
+                                    break;
+                                //case "-w":
+                                //    //wait = true;
+                                //    break;
+                                default: break;
                             }
+                        }
 
+                        // Pop Toast
+                        ToastService.ShowInteractiveToast(toastModel, AppId);
 
-                            break;
-                        case "-p":
-                            if (i + 1 < e.Args.Length)
-                            {
-                                toastModel.ImagePath = e.Args[i + 1];
-                            }
-                            else
-                            {
-                                Console.WriteLine("Missing argument to -p.\n Supply argument as -p \"image path\"\n");
-                                Environment.Exit(-1);
-                            }
-
-                            break;
-                        case "-silent":
-                            toastModel.Silent = true;
-                            break;
-                        //case "-w":
-                        //    //wait = true;
-                        //    break;
-                        default: break;
+                        // base.OnStartup(e);
+                        Application.Current.Shutdown();
                     }
                 }
-
-
-
-                var tstService = new SendToastService();
-                tstService.ShowInteractiveToast(toastModel, AUMID);
-
-
-
-                // If launched from a toast
-                // This launch arg was specified in our WiX installer where we register the LocalServer32 exe path.
-                //if (e.e.Args.Contains(DesktopNotificationManagerCompat.TOAST_ACTIVATED_LAUNCH_ARG))
-                //{
-                //    // Our NotificationActivator code will run after this completes,
-                //    // and will show a window if necessary.
-                //}
-                //else
-                //{
-                //    // Show the window
-                //    // In App.xaml, be sure to remove the StartupUri so that a window doesn't
-                //    // get created by default, since we're creating windows ourselves (and sometimes we
-                //    // don't want to create a window if handling a background activation).
-                //    //new MainWindow().Show();
-                //}
-
-                // base.OnStartup(e);
-                Application.Current.Shutdown();
             }
-
         }
+
         private static void PrintHelp()
         {
             String inst = "---- Usage ----\n" +

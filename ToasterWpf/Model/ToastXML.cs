@@ -2,6 +2,7 @@
 using Microsoft.QueryStringDotNET;
 using Microsoft.Toolkit.Uwp.Notifications;
 
+
 namespace ToasterWpf.Model
 {
     public class ToastXml
