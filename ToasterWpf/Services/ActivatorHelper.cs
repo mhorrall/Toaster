@@ -1,39 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using ToasterWpf.Helper;
 
-namespace ToasterWpf
+namespace ToasterWpf.Services
 {
 	public  class ActivatorHelper
 	{
 		private static int? _cookie;
-		//private static Action<string, Dictionary<string, string>> _action;
-
-		/// <summary>
-		/// Register COM class type.
-		/// </summary>
-		/// <param name="activatorType">Notification activator type</param>
-		/// <param name="action">Action to be invoked when Activate callback method is called</param>
-		/// <remarks>Notification activator must inherit from this class.</remarks>
-		//public static void RegisterComType(Type activatorType, Action<string, Dictionary<string, string>> action)
-		//{
-		//	NotificationHelper.CheckArgument(activatorType);
-
-		//	if (!OsVersion.IsTenOrNewer)
-		//		return;
-
-		//	if (_cookie.HasValue)
-		//		return;
-
-		//	_cookie = new RegistrationServices().RegisterTypeForComClients(
-		//		activatorType,
-		//		RegistrationClassContext.LocalServer,
-		//		RegistrationConnectionType.MultipleUse);
-
-		//	_action = action;
-		//}
 
 		/// <summary>
 		/// Registers the activator type as a COM server client so that Windows can launch your activator.
@@ -100,25 +74,11 @@ namespace ToasterWpf
 				key.SetValue(null, combinedPath);
 			}
 		}
-		public const string TOAST_ACTIVATED_LAUNCH_ARG = "-ToastActivated";
-		private static void RegisterComServer<T>(String exePath) where T : NotificationActivatorBase
-		{
-			// We register the EXE to start up when the notification is activated
-			string regString = $"SOFTWARE\\Classes\\CLSID\\{{{typeof(T).GUID}}}\\LocalServer32";
-			var key = Registry.CurrentUser.CreateSubKey(regString);
-
-			// Include a flag so we know this was a toast activation and should wait for COM to process
-			// We also wrap EXE path in quotes for extra security
-			key.SetValue(null, '"' + exePath + '"' + " " + TOAST_ACTIVATED_LAUNCH_ARG);
-		}
 
 		public static void CheckArgument(Type activatorType)
 		{
 			if (activatorType == null)
 				throw new ArgumentNullException(nameof(activatorType));
-
-			//if (!activatorType.IsSubclassOf(typeof(NotificationActivatorBase)))
-			//throw new ArgumentException($"{nameof(activatorType)} must inherit from {nameof(NotificationActivatorBase)}.");
 		}
 
 	}

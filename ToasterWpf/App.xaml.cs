@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using NLog;
 using ToasterWpf.Model;
+using ToasterWpf.Services;
 
 namespace ToasterWpf
 {

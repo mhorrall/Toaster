@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ToasterWpf.Helper;
 using ToasterWpf.Model;
 
-namespace ToasterWpf
+namespace ToasterWpf.Services
 {
     public class ShortcutService
     {

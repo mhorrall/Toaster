@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Microsoft.QueryStringDotNET;
 using NLog;
 
-namespace ToasterWpf
+namespace ToasterWpf.Services
 {
 	/// <summary>
 	/// Inherited class of notification activator (for Action Center of Windows 10)

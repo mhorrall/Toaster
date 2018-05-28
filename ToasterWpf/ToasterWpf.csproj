@@ -133,20 +133,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ActivatorHelper.cs" />
+    <Compile Include="Services\ActivatorHelper.cs" />
     <Compile Include="Helper\OsVersion.cs" />
     <Compile Include="Helper\ShellLink.cs" />
     <Compile Include="Helper\Shortcut.cs" />
     <Compile Include="Helper\StringExtension.cs" />
     <Compile Include="Model\ShortcutModel.cs" />
-    <Compile Include="SendToastService.cs" />
-    <Compile Include="Model\ShortcutWindowState.cs" />
-    <Compile Include="Model\ToastAudioEnum.cs" />
-    <Compile Include="ShortcutService.cs" />
-    <Compile Include="ToastManager.cs" />
+    <Compile Include="Services\SendToastService.cs" />
+    <Compile Include="Helper\ShortcutWindowState.cs" />
+    <Compile Include="Services\ShortcutService.cs" />
     <Compile Include="Model\ToastModel.cs" />
-    <Compile Include="Model\ToastRequest.cs" />
-    <Compile Include="Model\ToastResult.cs" />
     <Compile Include="Model\ToastXML.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -154,8 +150,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NotificationActivator.cs" />
-    <Compile Include="NotificationActivatorBase.cs" />
+    <Compile Include="Services\NotificationActivator.cs" />
+    <Compile Include="Services\NotificationActivatorBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

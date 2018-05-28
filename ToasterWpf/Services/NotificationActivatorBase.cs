@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace ToasterWpf
+namespace ToasterWpf.Services
 {
 	/// <summary>
 	/// Apps must implement this activator to handle notification activation.

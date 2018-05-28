@@ -1,5 +1,5 @@
 ﻿
-namespace ToasterWpf
+namespace ToasterWpf.Helper
 {
 	/// <summary>
 	/// Window states of shortcut
